@@ -34,7 +34,7 @@
       .from("siswa")
       .select("*")
       .eq("nis", nis)
-      .single();
+      .maybeSingle();
 
     if (err || !data) {
       error.textContent = "NIS tidak ditemukan";
