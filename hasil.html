@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Hasil Voting OSIS (Realtime)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; text-align:center; margin:0; padding:20px }
+    h1 { margin-bottom:20px }
+    .card {
+      background:#fff;
+      padding:20px;
+      margin:15px auto;
+      max-width:420px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,.15)
+    }
+    h2 { margin:0 0 10px }
+    .count { font-size:36px; color:#007bff; font-weight:bold }
+    footer { margin-top:30px; color:#666; font-size:12px }
+  </style>
+</head>
+<body>
+
+<h1>📊 Hasil Pemilihan OSIS</h1>
+<div id="list"></div>
+
+<footer>Realtime • Supabase • GitHub Pages</footer>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
+
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const list = document.getElementById("list");
+
+  async function loadData() {
+    const { data: kandidat } = await db.from("kandidat").select("*");
+    const { data: suara } = await db.from("suara").select("kandidat_id");
+
+    const hasil = {};
+    suara.forEach(s => {
+      hasil[s.kandidat_id] = (hasil[s.kandidat_id] || 0) + 1;
+    });
+
+    list.innerHTML = "";
+    kandidat.forEach(k => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h2>${k.nama}</h2>
+        <div class="count">${hasil[k.id] || 0} suara</div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  loadData();
+
+  db.channel("realtime-suara")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "suara" },
+      () => loadData()
+    )
+    .subscribe();
+</script>
+
+</body>
+</html>
