@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Voting OSIS</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -11,35 +10,40 @@
 <div id="kandidat"></div>
 <p id="msg"></p>
 
-<script>
-const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
-const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const nis = localStorage.getItem("nis");
-if (!nis) location.href = "index.html";
+  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
 
-async function loadKandidat() {
-  const { data } = await db.from("kandidat").select("*");
-  const div = document.getElementById("kandidat");
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  data.forEach(k => {
-    const btn = document.createElement("button");
-    btn.textContent = k.nama;
-    btn.onclick = () => vote(k.id);
-    div.appendChild(btn);
-    div.appendChild(document.createElement("br"));
-  });
-}
+  const nis = localStorage.getItem("nis");
+  if (!nis) location.href = "index.html";
 
-async function vote(id) {
-  await db.from("suara").insert({ nis, kandidat_id: id });
-  await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
-  localStorage.removeItem("nis");
-  document.getElementById("msg").textContent = "Terima kasih, suara tersimpan.";
-}
+  async function loadKandidat() {
+    const { data } = await db.from("kandidat").select("*");
+    const div = document.getElementById("kandidat");
 
-loadKandidat();
+    div.innerHTML = "";
+    data.forEach(k => {
+      const btn = document.createElement("button");
+      btn.textContent = k.nama;
+      btn.onclick = () => vote(k.id);
+      div.appendChild(btn);
+      div.appendChild(document.createElement("br"));
+    });
+  }
+
+  async function vote(id) {
+    await db.from("suara").insert({ nis, kandidat_id: id });
+    await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
+    localStorage.removeItem("nis");
+    document.getElementById("msg").textContent = "Terima kasih, suara tersimpan.";
+  }
+
+  loadKandidat();
 </script>
+
 </body>
 </html>

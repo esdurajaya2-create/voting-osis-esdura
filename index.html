@@ -4,43 +4,54 @@
   <meta charset="UTF-8">
   <title>Login Voting OSIS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
 <h2>Login Voting OSIS</h2>
 <input id="nis" placeholder="Masukkan NIS">
-<button onclick="login()">Masuk</button>
+<button id="btnLogin">Masuk</button>
 <p id="error"></p>
 
-<script>
-const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
-const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-async function login() {
-  const nis = document.getElementById("nis").value.trim();
-  const error = document.getElementById("error");
-  error.textContent = "";
+  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
 
-  const { data, error: err } = await db
-    .from("siswa")
-    .select("*")
-    .eq("nis", nis)
-    .single();
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  if (err || !data) {
-    error.textContent = "NIS tidak ditemukan";
-    return;
+  async function login() {
+    const nis = document.getElementById("nis").value.trim();
+    const error = document.getElementById("error");
+    error.textContent = "";
+
+    if (!nis) {
+      error.textContent = "NIS wajib diisi";
+      return;
+    }
+
+    const { data, error: err } = await db
+      .from("siswa")
+      .select("*")
+      .eq("nis", nis)
+      .single();
+
+    if (err || !data) {
+      error.textContent = "NIS tidak ditemukan";
+      return;
+    }
+
+    if (data.sudah_memilih) {
+      error.textContent = "Kamu sudah memilih";
+      return;
+    }
+
+    localStorage.setItem("nis", nis);
+    location.href = "voting.html";
   }
 
-  if (data.sudah_memilih) {
-    error.textContent = "Kamu sudah memilih";
-    return;
-  }
-
-  localStorage.setItem("nis", nis);
-  location.href = "voting.html";
-}
+  document.getElementById("btnLogin").addEventListener("click", login);
 </script>
+
 </body>
 </html>
