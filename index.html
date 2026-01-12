@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login Voting OSIS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<h2>Login Voting OSIS</h2>
+<input type="text" id="nis" placeholder="Masukkan NIS" />
+<button onclick="login()">Masuk</button>
+<p id="msg"></p>
+
+<script>
+const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function login() {
+  const nis = document.getElementById("nis").value.trim();
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  const { data, error } = await supabase
+    .from("siswa")
+    .select("*")
+    .eq("nis", nis)
+    .single();
+
+  if (error || !data) {
+    msg.textContent = "NIS tidak ditemukan";
+    return;
+  }
+  if (data.sudah_memilih) {
+    msg.textContent = "Kamu sudah memilih";
+    return;
+  }
+  localStorage.setItem("nis", nis);
+  window.location.href = "voting.html";
+}
+</script>
+</body>
+</html>

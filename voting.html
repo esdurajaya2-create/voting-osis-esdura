@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Voting OSIS</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<h2>Pilih Kandidat</h2>
+<div id="list"></div>
+<p id="msg"></p>
+
+<script>
+const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const nis = localStorage.getItem("nis");
+
+if (!nis) location.href = "index.html";
+
+async function load() {
+  const { data } = await supabase.from("kandidat").select("*");
+  const list = document.getElementById("list");
+  data.forEach(k => {
+    const btn = document.createElement("button");
+    btn.textContent = k.nama;
+    btn.onclick = () => vote(k.id);
+    list.appendChild(btn);
+  });
+}
+
+async function vote(id) {
+  await supabase.from("suara").insert({ nis: nis, kandidat_id: id });
+  await supabase.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
+  localStorage.removeItem("nis");
+  document.getElementById("msg").textContent = "Terima kasih, suara tersimpan";
+}
+
+load();
+</script>
+</body>
+</html>
