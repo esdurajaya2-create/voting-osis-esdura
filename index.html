@@ -26,10 +26,11 @@
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   async function login() {
-    const nis = document.getElementById("nis").value.trim();
+    const nisInput = document.getElementById("nis");
     const info = document.getElementById("info");
     info.textContent = "";
 
+    const nis = nisInput.value.trim();
     if (!nis) {
       info.textContent = "NIS wajib diisi";
       return;
@@ -43,6 +44,7 @@
 
     if (!data) {
       info.textContent = "NIS tidak ditemukan";
+      setTimeout(() => info.textContent = "", 2000);
       return;
     }
 
@@ -50,13 +52,13 @@
       info.textContent = "❌ Kamu sudah melakukan voting";
       setTimeout(() => {
         info.textContent = "";
-        document.getElementById("nis").value = "";
+        nisInput.value = "";
       }, 2000);
       return;
     }
 
     localStorage.setItem("nis", nis);
-    location.href = "voting.html";
+    location.replace("voting.html");
   }
 
   document.getElementById("btnLogin").addEventListener("click", login);

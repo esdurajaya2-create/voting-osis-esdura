@@ -26,9 +26,9 @@
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const nis = localStorage.getItem("nis");
-  if (!nis) location.href = "index.html";
+  if (!nis) location.replace("index.html");
 
-  async function loadSiswaInfo() {
+  async function init() {
     const { data } = await db
       .from("siswa")
       .select("nama, kelas, sudah_memilih")
@@ -37,18 +37,19 @@
 
     if (!data || data.sudah_memilih) {
       localStorage.removeItem("nis");
-      location.href = "index.html";
+      location.replace("index.html");
       return;
     }
 
     document.getElementById("welcome").textContent =
       `Halo ${data.nama} (${data.kelas}), silakan pilih calon kamu`;
+
+    loadKandidat();
   }
 
   async function loadKandidat() {
     const { data } = await db.from("kandidat").select("*");
     const div = document.getElementById("kandidat");
-    div.innerHTML = "";
 
     data.forEach(k => {
       const btn = document.createElement("button");
@@ -59,10 +60,7 @@
   }
 
   async function vote(id) {
-    document.querySelectorAll("button").forEach(btn => {
-      btn.disabled = true;
-      btn.style.display = "none";
-    });
+    document.querySelectorAll("button").forEach(b => b.remove());
 
     const msg = document.getElementById("msg");
     msg.textContent = "⏳ Menyimpan suara...";
@@ -74,12 +72,11 @@
     msg.textContent = "✅ Terima kasih, suara kamu sudah tersimpan";
 
     setTimeout(() => {
-      location.href = "index.html";
+      location.replace("index.html");
     }, 2000);
   }
 
-  loadSiswaInfo();
-  loadKandidat();
+  init();
 </script>
 
 </body>
