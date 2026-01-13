@@ -37,8 +37,24 @@
   const list = document.getElementById("list");
 
   async function loadData() {
-    const { data: kandidat } = await db.from("kandidat").select("*");
-    const { data: suara } = await db.from("suara").select("kandidat_id");
+    // Ambil data kandidat dan urutkan berdasarkan no_urut
+    const { data: kandidat, error: kandidatError } = await db
+      .from("kandidat")
+      .select("*")
+      .order("no_urut", { ascending: true }); // Urutkan berdasarkan no_urut
+
+    if (kandidatError) {
+      console.error(kandidatError);
+      return;
+    }
+
+    // Ambil data suara
+    const { data: suara, error: suaraError } = await db.from("suara").select("kandidat_id");
+
+    if (suaraError) {
+      console.error(suaraError);
+      return;
+    }
 
     const hasil = {};
     suara.forEach(s => {
@@ -58,7 +74,7 @@
   }
 
   loadData();
-  setInterval(loadData, 2000);
+  setInterval(loadData, 2000); // Update setiap 2 detik
 </script>
 
 </body>
