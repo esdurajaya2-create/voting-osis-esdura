@@ -1,82 +1,155 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Voting OSIS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f6f8; text-align:center; padding:20px }
-    button { padding:10px 20px; margin:10px; font-size:16px }
-    #msg { margin-top:20px; font-weight:bold }
-  </style>
+<meta charset="UTF-8">
+<title>PEMILIHAN KETUA OSIS SMPN 2 RANCAEKEK</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#ffffff;
+  color:#222;
+}
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px 20px;
+  border-bottom:3px solid #e53935;
+}
+header img{
+  height:50px;
+}
+.title{
+  text-align:center;
+}
+.title h1{
+  font-size:20px;
+  margin:0;
+  color:#e53935;
+}
+.title h2{
+  font-size:14px;
+  margin:0;
+  color:#1e88e5;
+}
+#welcome{
+  text-align:center;
+  margin:20px 0;
+  font-weight:600;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  padding:20px;
+}
+.card{
+  border:1px solid #ddd;
+  border-radius:16px;
+  padding:15px;
+  text-align:center;
+  box-shadow:0 4px 8px rgba(0,0,0,.05);
+}
+.card img{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.card h3{
+  margin:12px 0;
+}
+.card button{
+  background:#e53935;
+  border:none;
+  color:#fff;
+  padding:10px 20px;
+  border-radius:25px;
+  font-size:16px;
+  cursor:pointer;
+}
+.card button:hover{
+  background:#c62828;
+}
+#msg{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:30px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Pilih Kandidat</h2>
-<h3 id="welcome"></h3>
+<header>
+  <img src="assets/img/logo-kpu.png">
+  <div class="title">
+    <h1>PEMILIHAN KETUA OSIS SMPN 2 RANCAEKEK</h1>
+    <h2>MASA BAKTI 2026/2027</h2>
+  </div>
+  <img src="assets/img/logo-sekolah.png">
+</header>
 
-<div id="kandidat"></div>
+<p id="welcome"></p>
+<div class="grid" id="kandidat"></div>
 <p id="msg"></p>
 
 <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const db = createClient(
+  "https://xmciyauebdxcqfkcclha.supabase.co",
+  "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP"
+);
 
-  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const nis = localStorage.getItem("nis");
+if(!nis) location.replace("index.html");
 
-  const nis = localStorage.getItem("nis");
-  if (!nis) location.replace("index.html");
+async function init(){
+  const {data:siswa} = await db.from("siswa")
+    .select("nama,kelas,sudah_memilih")
+    .eq("nis",nis).single();
 
-  async function init() {
-    const { data } = await db
-      .from("siswa")
-      .select("nama, kelas, sudah_memilih")
-      .eq("nis", nis)
-      .single();
-
-    if (!data || data.sudah_memilih) {
-      localStorage.removeItem("nis");
-      location.replace("index.html");
-      return;
-    }
-
-    document.getElementById("welcome").textContent =
-      `Halo ${data.nama} (${data.kelas}), silakan pilih calon kamu`;
-
-    loadKandidat();
-  }
-
-  async function loadKandidat() {
-    const { data } = await db.from("kandidat").select("*");
-    const div = document.getElementById("kandidat");
-
-    data.forEach(k => {
-      const btn = document.createElement("button");
-      btn.textContent = k.nama;
-      btn.onclick = () => vote(k.id);
-      div.appendChild(btn);
-    });
-  }
-
-  async function vote(id) {
-    document.querySelectorAll("button").forEach(b => b.remove());
-
-    const msg = document.getElementById("msg");
-    msg.textContent = "⏳ Menyimpan suara...";
-
-    await db.from("suara").insert({ nis, kandidat_id: id });
-    await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
-
+  if(!siswa || siswa.sudah_memilih){
     localStorage.removeItem("nis");
-    msg.textContent = "✅ Terima kasih, suara kamu sudah tersimpan";
-
-    setTimeout(() => {
-      location.replace("index.html");
-    }, 2000);
+    location.replace("index.html");
+    return;
   }
 
-  init();
+  document.getElementById("welcome").innerText =
+    `Halo ${siswa.nama} (${siswa.kelas}), silakan pilih calon kamu`;
+
+  const {data:kandidat} = await db.from("kandidat").select("*");
+  const grid = document.getElementById("kandidat");
+
+  kandidat.forEach(k=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <img src="${k.foto}">
+      <h3>${k.nama}</h3>
+      <button>PILIH</button>
+    `;
+    card.querySelector("button").onclick=()=>vote(k.id);
+    grid.appendChild(card);
+  });
+}
+
+async function vote(id){
+  document.querySelectorAll("button").forEach(b=>b.remove());
+  document.getElementById("msg").innerText="⏳ Menyimpan suara...";
+  await db.from("suara").insert({nis, kandidat_id:id});
+  await db.from("siswa").update({sudah_memilih:true}).eq("nis",nis);
+  localStorage.removeItem("nis");
+  document.getElementById("msg").innerText="✅ Terima kasih, suara kamu sudah tersimpan";
+  setTimeout(()=>location.replace("index.html"),2000);
+}
+
+init();
 </script>
 
 </body>
