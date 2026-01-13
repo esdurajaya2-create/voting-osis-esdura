@@ -130,14 +130,24 @@ async function init(){
   
   const grid = document.getElementById("kandidat");
 
+// Gambar kandidat berdasarkan no_urut
+const gambarKandidat = {
+  1: 'https://example.com/gambar1.png',
+  2: 'https://example.com/gambar2.png',
+  3: 'https://example.com/gambar3.png',
+  4: 'https://example.com/gambar4.png',
+  5: 'https://example.com/gambar5.png',
+};
+
+  
   kandidat.forEach(k=>{
     const card=document.createElement("div");
     card.className="card";
-    card.innerHTML=`
-      <img src="${kandidat.foto_url}" alt="${kandidat.nama}">
-      <h3>${k.nama}</h3>
-      <button>PILIH</button>
-    `;
+    card.innerHTML = `
+  <img src="${gambarKandidat[k.no_urut]}" alt="${k.nama}">
+  <h3>${k.nama}</h3>
+  <button>PILIH</button>
+`;
     card.querySelector("button").onclick=()=>vote(k.id);
     grid.appendChild(card);
   });
