@@ -141,6 +141,9 @@ async function init(){
 
   // Loop untuk menampilkan kandidat beserta gambar
   kandidat.forEach((k, index) => {
+
+console.log(`Calon ${k.no_urut} - Gambar: ${gambarCalon[index]}`);  // Log gambar yang dipilih
+    
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
