@@ -1,87 +1,87 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>PEMILIHAN KETUA OSIS SMPN 2 RANCAEKEK</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>PEMILIHAN KETUA OSIS SMPN 2 RANCAEKEK</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:#ffffff;
-  color:#222;
-}
-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:15px 20px;
-  border-bottom:3px solid #e53935;
-}
-header img{
-  height:100px;
-}
-.title{
-  text-align:center;
-}
-.title h1{
-  font-size:40px;
-  margin:0;
-  color:#e53935;
-}
-.title h2{
-  font-size:34px;
-  margin:0;
-  color:#1e88e5;
-}
-#welcome{
-  text-align:center;
-  margin:20px 0;
-  font-weight:600;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-  padding:20px;
-}
-.card{
-  border:1px solid #ddd;
-  border-radius:16px;
-  padding:15px;
-  text-align:center;
-  box-shadow:0 4px 8px rgba(0,0,0,.05);
-}
-.card img{
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  object-fit:cover;
-}
-.card h3{
-  margin:12px 0;
-}
-.card button{
-  background:#e53935;
-  border:none;
-  color:#fff;
-  padding:10px 20px;
-  border-radius:25px;
-  font-size:16px;
-  cursor:pointer;
-}
-.card button:hover{
-  background:#c62828;
-}
-#msg{
-  text-align:center;
-  font-weight:bold;
-  margin-bottom:30px;
-}
-</style>
+  <style>
+    body{
+      margin:0;
+      font-family:'Poppins',sans-serif;
+      background:#ffffff;
+      color:#222;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:15px 20px;
+      border-bottom:3px solid #e53935;
+    }
+    header img{
+      height:100px;
+    }
+    .title{
+      text-align:center;
+    }
+    .title h1{
+      font-size:40px;
+      margin:0;
+      color:#e53935;
+    }
+    .title h2{
+      font-size:34px;
+      margin:0;
+      color:#1e88e5;
+    }
+    #welcome{
+      text-align:center;
+      margin:20px 0;
+      font-weight:600;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px;
+      padding:20px;
+    }
+    .card{
+      border:1px solid #ddd;
+      border-radius:16px;
+      padding:15px;
+      text-align:center;
+      box-shadow:0 4px 8px rgba(0,0,0,.05);
+    }
+    .card img{
+      width:140px;
+      height:140px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+    .card h3{
+      margin:12px 0;
+    }
+    .card button{
+      background:#e53935;
+      border:none;
+      color:#fff;
+      padding:10px 20px;
+      border-radius:25px;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .card button:hover{
+      background:#c62828;
+    }
+    #msg{
+      text-align:center;
+      font-weight:bold;
+      margin-bottom:30px;
+    }
+  </style>
 </head>
 
 <body>
@@ -123,35 +123,32 @@ async function init(){
   document.getElementById("welcome").innerHTML =
     `Halo <u>${siswa.nama}</u> - KELAS <u>${siswa.kelas}</u>, silakan pilih calon kamu`;
 
- // Ambil data kandidat dan urutkan berdasarkan 'no_urut'
+  // Ambil data kandidat dari supabase
   const { data: kandidat } = await db.from("kandidat")
     .select("*")
-    .order('no_urut', { ascending: true }); // Mengurutkan kandidat berdasarkan no_urut
-  
+    .order('no_urut', { ascending: true });
+
   const grid = document.getElementById("kandidat");
 
-// Gambar kandidat berdasarkan no_urut
-const gambarKandidat = {
-  1: 'https://esdurajaya2-create.github.io/voting-osis-esdura/assets/img/calon1.png',
-  2: 'https://i.ibb.co.com/s9pCvj1g/calon1.png',
-  3: 'https://i.ibb.co.com/s9pCvj1g/calon1.png',
-  4: 'https://i.ibb.co.com/s9pCvj1g/calon1.png',
-  5: 'https://i.ibb.co.com/s9pCvj1g/calon1.png',
-};
+  // Daftar gambar yang sesuai dengan urutan
+  const gambarCalon = [
+    "assets/img/calon1.png", // Calon 1
+    "assets/img/calon2.png", // Calon 2
+    "assets/img/calon3.png", // Calon 3
+    "assets/img/calon4.png", // Calon 4
+    "assets/img/calon5.png"  // Calon 5
+  ];
 
-  
-  kandidat.forEach(k=>{
-    
- console.log(k);  // Tambahkan baris ini untuk memeriksa data kandidat yang diambil
-    
-    const card=document.createElement("div");
-    card.className="card";
+  // Loop untuk menampilkan kandidat beserta gambar
+  kandidat.forEach((k, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
     card.innerHTML = `
-  <img src="${gambarKandidat[k.no_urut]}" alt="${k.nama}">
-  <h3>${k.nama}</h3>
-  <button>PILIH</button>
-`;
-    card.querySelector("button").onclick=()=>vote(k.id);
+      <img src="${gambarCalon[index]}" alt="Calon ${index + 1}">
+      <h3>${k.nama}</h3>
+      <button>PILIH</button>
+    `;
+    card.querySelector("button").onclick = () => vote(k.id);
     grid.appendChild(card);
   });
 }
