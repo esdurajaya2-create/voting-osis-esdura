@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Hasil Voting OSIS (Realtime)</title>
+  <title>Hasil Voting OSIS (Live)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; background:#f4f6f8; text-align:center; margin:0; padding:20px }
@@ -25,7 +25,7 @@
 <h1>📊 Hasil Pemilihan OSIS</h1>
 <div id="list"></div>
 
-<footer>Realtime • Supabase • GitHub Pages</footer>
+<footer>Live update otomatis (gratis)</footer>
 
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -58,14 +58,7 @@
   }
 
   loadData();
-
-  db.channel("realtime-suara")
-    .on(
-      "postgres_changes",
-      { event: "INSERT", schema: "public", table: "suara" },
-      () => loadData()
-    )
-    .subscribe();
+  setInterval(loadData, 2000);
 </script>
 
 </body>
