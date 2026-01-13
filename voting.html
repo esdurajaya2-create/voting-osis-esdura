@@ -23,7 +23,6 @@
 
   const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
   const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
-
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const nis = localStorage.getItem("nis");
@@ -32,14 +31,18 @@
   async function loadSiswaInfo() {
     const { data } = await db
       .from("siswa")
-      .select("nama, kelas")
+      .select("nama, kelas, sudah_memilih")
       .eq("nis", nis)
       .single();
 
-    if (data) {
-      document.getElementById("welcome").textContent =
-        `Halo ${data.nama} (${data.kelas}), silakan pilih calon kamu`;
+    if (!data || data.sudah_memilih) {
+      localStorage.removeItem("nis");
+      location.href = "index.html";
+      return;
     }
+
+    document.getElementById("welcome").textContent =
+      `Halo ${data.nama} (${data.kelas}), silakan pilih calon kamu`;
   }
 
   async function loadKandidat() {
@@ -65,7 +68,6 @@
     msg.textContent = "⏳ Menyimpan suara...";
 
     const { error } = await db.from("suara").insert({ nis, kandidat_id: id });
-
     if (error) {
       msg.textContent = "❌ Gagal menyimpan suara";
       return;
@@ -73,7 +75,11 @@
 
     await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
     localStorage.removeItem("nis");
-    msg.textContent = "✅ Terima kasih, data sudah tersimpan.";
+    msg.textContent = "✅ Terima kasih, suara kamu sudah tersimpan.";
+
+    setTimeout(() => {
+      location.href = "index.html";
+    }, 2000);
   }
 
   loadSiswaInfo();
