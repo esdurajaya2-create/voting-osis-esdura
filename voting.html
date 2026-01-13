@@ -120,8 +120,8 @@ async function init(){
     return;
   }
 
-  document.getElementById("welcome").innerText =
-    `Halo <strong><u>${siswa.nama}</u></strong> - Kelas <strong><u>${siswa.kelas}</u></strong>, silakan pilih calon kamu`;
+  document.getElementById("welcome").innerHTML =
+    `Halo <u>${siswa.nama}</u> - KELAS <u>${siswa.kelas}</u>, silakan pilih calon kamu`;
 
  // Ambil data kandidat dan urutkan berdasarkan 'no_urut'
   const { data: kandidat } = await db.from("kandidat")
