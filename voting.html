@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Voting OSIS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; text-align:center; padding:20px }
+    button { padding:10px 20px; margin:10px; font-size:16px }
+    #msg { margin-top:20px; font-weight:bold }
+  </style>
 </head>
 <body>
 
 <h2>Pilih Kandidat</h2>
+<h3 id="welcome"></h3>
+
 <div id="kandidat"></div>
 <p id="msg"></p>
 
@@ -21,27 +29,54 @@
   const nis = localStorage.getItem("nis");
   if (!nis) location.href = "index.html";
 
+  async function loadSiswaInfo() {
+    const { data } = await db
+      .from("siswa")
+      .select("nama, kelas")
+      .eq("nis", nis)
+      .single();
+
+    if (data) {
+      document.getElementById("welcome").textContent =
+        `Halo ${data.nama} (${data.kelas}), silakan pilih calon kamu`;
+    }
+  }
+
   async function loadKandidat() {
     const { data } = await db.from("kandidat").select("*");
     const div = document.getElementById("kandidat");
-
     div.innerHTML = "";
+
     data.forEach(k => {
       const btn = document.createElement("button");
       btn.textContent = k.nama;
       btn.onclick = () => vote(k.id);
       div.appendChild(btn);
-      div.appendChild(document.createElement("br"));
     });
   }
 
   async function vote(id) {
-    await db.from("suara").insert({ nis, kandidat_id: id });
+    document.querySelectorAll("button").forEach(btn => {
+      btn.disabled = true;
+      btn.style.display = "none";
+    });
+
+    const msg = document.getElementById("msg");
+    msg.textContent = "⏳ Menyimpan suara...";
+
+    const { error } = await db.from("suara").insert({ nis, kandidat_id: id });
+
+    if (error) {
+      msg.textContent = "❌ Gagal menyimpan suara";
+      return;
+    }
+
     await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
     localStorage.removeItem("nis");
-    document.getElementById("msg").textContent = "Terima kasih, suara tersimpan.";
+    msg.textContent = "✅ Terima kasih, data sudah tersimpan.";
   }
 
+  loadSiswaInfo();
   loadKandidat();
 </script>
 
