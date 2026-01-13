@@ -67,15 +67,11 @@
     const msg = document.getElementById("msg");
     msg.textContent = "⏳ Menyimpan suara...";
 
-    const { error } = await db.from("suara").insert({ nis, kandidat_id: id });
-    if (error) {
-      msg.textContent = "❌ Gagal menyimpan suara";
-      return;
-    }
-
+    await db.from("suara").insert({ nis, kandidat_id: id });
     await db.from("siswa").update({ sudah_memilih: true }).eq("nis", nis);
+
     localStorage.removeItem("nis");
-    msg.textContent = "✅ Terima kasih, suara kamu sudah tersimpan.";
+    msg.textContent = "✅ Terima kasih, suara kamu sudah tersimpan";
 
     setTimeout(() => {
       location.href = "index.html";
