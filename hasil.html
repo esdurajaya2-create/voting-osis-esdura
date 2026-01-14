@@ -2,79 +2,120 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Hasil Voting OSIS (Live)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hasil Pemilihan Ketua OSIS</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f6f8; text-align:center; margin:0; padding:20px }
-    h1 { margin-bottom:20px }
-    .card {
-      background:#fff;
-      padding:20px;
-      margin:15px auto;
-      max-width:420px;
-      border-radius:12px;
-      box-shadow:0 2px 8px rgba(0,0,0,.15)
+    /* Full page, no scroll */
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
     }
-    h2 { margin:0 0 10px }
-    .count { font-size:36px; color:#007bff; font-weight:bold }
-    footer { margin-top:30px; color:#666; font-size:12px }
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      flex-direction: column;
+    }
+    #chart-container {
+      width: 80%;
+      height: 400px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      display: inline-block;
+      width: 200px;
+    }
+    .card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .card h3 {
+      margin-top: 10px;
+      color: #333;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<h1>📊 Hasil Pemilihan OSIS</h1>
-<div id="list"></div>
+<div id="container">
+  <h1>📊 Hasil Pemilihan Ketua OSIS</h1>
+  <div id="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
 
-<footer>Live update otomatis (gratis)</footer>
+  <div id="candidates-container"></div>
 
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  <footer>© D.N.S 2026</footer>
+</div>
 
-  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
-
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-  const list = document.getElementById("list");
-
-  async function loadData() {
-    // Ambil data kandidat dan urutkan berdasarkan no_urut
-    const { data: kandidat, error: kandidatError } = await db
-      .from("kandidat")
-      .select("*")
-      .order("no_urut", { ascending: true }); // Urutkan berdasarkan no_urut
-
-    if (kandidatError) {
-      console.error(kandidatError);
-      return;
+<script>
+  // Set up the chart
+  const ctx = document.getElementById('myChart').getContext('2d');
+  const myChart = new Chart(ctx, {
+    type: 'bar', // Bar chart
+    data: {
+      labels: ['Calon 1', 'Calon 2', 'Calon 3', 'Calon 4', 'Calon 5'],
+      datasets: [{
+        label: 'Jumlah Suara',
+        data: [12, 19, 3, 5, 2], // Example data (this will be dynamic)
+        backgroundColor: ['#e53935', '#1e88e5', '#e53935', '#1e88e5', '#e53935'],
+        borderColor: ['#d32f2f', '#1565c0', '#d32f2f', '#1565c0', '#d32f2f'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: {
+        duration: 2000, // Animation duration
+        easing: 'easeOutBounce' // Animation effect
+      }
     }
+  });
 
-    // Ambil data suara
-    const { data: suara, error: suaraError } = await db.from("suara").select("kandidat_id");
+  // Data for candidates
+  const candidates = [
+    { name: 'Calon 1', image: 'assets/img/calon1.png', votes: 12 },
+    { name: 'Calon 2', image: 'assets/img/calon2.png', votes: 19 },
+    { name: 'Calon 3', image: 'assets/img/calon3.png', votes: 3 },
+    { name: 'Calon 4', image: 'assets/img/calon4.png', votes: 5 },
+    { name: 'Calon 5', image: 'assets/img/calon5.png', votes: 2 },
+  ];
 
-    if (suaraError) {
-      console.error(suaraError);
-      return;
-    }
+  // Display candidates
+  const candidatesContainer = document.getElementById('candidates-container');
+  candidates.forEach(candidate => {
+    const candidateCard = document.createElement('div');
+    candidateCard.className = 'card';
+    candidateCard.innerHTML = `
+      <img src="${candidate.image}" alt="${candidate.name}">
+      <h3>${candidate.name}</h3>
+      <p>Suara: ${candidate.votes}</p>
+    `;
+    candidatesContainer.appendChild(candidateCard);
+  });
 
-    const hasil = {};
-    suara.forEach(s => {
-      hasil[s.kandidat_id] = (hasil[s.kandidat_id] || 0) + 1;
-    });
-
-    list.innerHTML = "";
-    kandidat.forEach(k => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <h2>${k.nama}</h2>
-        <div class="count">${hasil[k.id] || 0} suara</div>
-      `;
-      list.appendChild(div);
-    });
-  }
-
-  loadData();
-  setInterval(loadData, 2000); // Update setiap 2 detik
+  // Simulate live data change
+  setInterval(() => {
+    const newVotes = [12, 19, 3, 5, 2]; // This should be dynamic
+    myChart.data.datasets[0].data = newVotes; // Update chart data
+    myChart.update();
+  }, 2000); // Update every 2 seconds
 </script>
 
 </body>
