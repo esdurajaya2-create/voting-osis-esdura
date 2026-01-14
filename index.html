@@ -8,14 +8,15 @@
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       height: 100vh;
-      margin: 0;
-      padding: 0;
       text-align: center;
     }
+
     header {
       display: flex;
       align-items: center;
@@ -23,43 +24,55 @@
       padding: 10px 20px;
       background: #ffffff;
       position: absolute;
-      width: 100%;
-      top: 10px;
+      top: 20px;
+      left: 20px;
+      right: 20px;
     }
+
     header img {
       height: 100px;
     }
+
     #login-container {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin-top: 120px;  /* Adjusted for header space */
+      margin-top: 120px; /* Adjust space for header */
       flex-grow: 1;
     }
+
     #input-container {
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      margin-top: 20px;
     }
+
     input, button {
       padding: 10px;
       font-size: 16px;
       margin: 10px;
+      max-width: 300px;
+      width: 100%;
     }
+
     #info {
       margin-top: 15px;
       color: red;
       font-weight: bold;
     }
+
     footer {
       text-align: center;
       font-size: 12px;
       color: #555;
       padding: 10px 0;
+      background: #fff;
     }
   </style>
 </head>
+
 <body>
 
 <header>
