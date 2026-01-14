@@ -8,40 +8,47 @@
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
-      text-align: center;
-      padding: 40px;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #ffffff;
+    }
+    header img {
+      height: 100px;
+    }
+    #login-container {
+      text-align: center;
+      margin-top: 50px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     input, button {
       padding: 10px;
       font-size: 16px;
+      margin-top: 10px;
     }
     #info {
       margin-top: 15px;
       color: red;
       font-weight: bold;
     }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 20px;
-      border-bottom: 3px solid #e53935;
-    }
-    header img {
-      height: 80px;
-    }
     footer {
       text-align: center;
       font-size: 12px;
       color: #555;
-      margin-top: 30px;
-    }
-    #login-container {
-      margin-top: 50px;
+      margin-top: 20px;
+      padding-bottom: 20px;
     }
   </style>
 </head>
@@ -54,7 +61,7 @@
 
 <div id="login-container">
   <h2>Login Voting OSIS</h2>
-  <input id="nis" placeholder="Masukkan NIS">
+  <input id="nis" placeholder="Masukkan Kode Siswa">
   <br><br>
   <button id="btnLogin">Masuk</button>
   <p id="info"></p>
@@ -78,7 +85,7 @@
 
     const nis = nisInput.value.trim();
     if (!nis) {
-      info.textContent = "Kode siswa wajib diisi";
+      info.textContent = "Kode Siswa wajib diisi";
       return;
     }
 
@@ -89,7 +96,7 @@
       .maybeSingle();
 
     if (!data) {
-      info.textContent = "kode siswa tidak ditemukan";
+      info.textContent = "Kode Siswa tidak ditemukan";
       setTimeout(() => info.textContent = "", 2000);
       return;
     }
