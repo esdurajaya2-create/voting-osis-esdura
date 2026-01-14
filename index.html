@@ -19,10 +19,10 @@
 
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 10px 20px;
-      background: #ffffff;
+      align-items: center;
+      padding: 20px;
+      background: #fff;
       position: absolute;
       top: 20px;
       left: 20px;
@@ -30,7 +30,7 @@
     }
 
     header img {
-      height: 100px;
+      height: 50px;
     }
 
     #login-container {
@@ -70,6 +70,15 @@
       padding: 10px 0;
       background: #fff;
     }
+
+    /* Adjust positioning of logos relative to the label */
+    .login-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 
@@ -81,7 +90,12 @@
 </header>
 
 <div id="login-container">
-  <h2>Login Voting OSIS</h2>
+  <div class="login-label">
+    <img src="assets/img/logo-kpu.png" alt="Logo KPU" style="height: 40px;">
+    <h2>Login Voting OSIS</h2>
+    <img src="assets/img/logo-sekolah.png" alt="Logo Sekolah" style="height: 40px;">
+  </div>
+
   <div id="input-container">
     <input id="nis" placeholder="Masukkan Kode siswa">
     <button id="btnLogin">Masuk</button>
