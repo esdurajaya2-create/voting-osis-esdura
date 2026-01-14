@@ -164,7 +164,7 @@
   fetchData();
 
   // Export function to CSV
-  function exportToCSV() {
+  window.exportToCSV = function exportToCSV() {
     const candidatesData = myChart.data.labels;
     const votesData = myChart.data.datasets[0].data;
 
