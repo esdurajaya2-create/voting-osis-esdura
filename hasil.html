@@ -21,6 +21,22 @@
       width: 80%;
       height: 400px;
       margin-bottom: 20px;
+      position: relative;
+    }
+    .export-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #1e88e5;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+    }
+    .export-btn:hover {
+      background-color: #1565c0;
     }
     .card {
       background: #fff;
@@ -56,6 +72,8 @@
   <h1>📊 Hasil Pemilihan Ketua OSIS</h1>
   <div id="chart-container">
     <canvas id="myChart"></canvas>
+    <!-- Export Button -->
+    <button class="export-btn" onclick="exportToCSV()">Export Laporan</button>
   </div>
 
   <div id="candidates-container"></div>
@@ -144,6 +162,25 @@
 
   // Initial fetch
   fetchData();
+
+  // Export function to CSV
+  function exportToCSV() {
+    const candidatesData = myChart.data.labels;
+    const votesData = myChart.data.datasets[0].data;
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Nama Calon, Jumlah Suara\n"; // Header
+
+    candidatesData.forEach((candidate, index) => {
+      csvContent += `${candidate}, ${votesData[index]}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "laporan_hasil_voting.csv");
+    link.click();
+  }
 </script>
 
 </body>
