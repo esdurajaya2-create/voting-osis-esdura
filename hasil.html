@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hasil Pemilihan Ketua OSIS</title>
   <style>
     /* Full page, no scroll */
@@ -65,15 +64,22 @@
 </div>
 
 <script>
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  
+  // Initialize Supabase
+  const SUPABASE_URL = "https://xmciyauebdxcqfkcclha.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_sZjIpWXyoBbPlnYITu15Hg_J7Vk8qaP";
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // Set up the chart
   const ctx = document.getElementById('myChart').getContext('2d');
   const myChart = new Chart(ctx, {
     type: 'bar', // Bar chart
     data: {
-      labels: ['Calon 1', 'Calon 2', 'Calon 3', 'Calon 4', 'Calon 5'],
+      labels: [], // To be filled with candidate names
       datasets: [{
         label: 'Jumlah Suara',
-        data: [12, 19, 3, 5, 2], // Example data (this will be dynamic)
+        data: [], // To be filled with vote data
         backgroundColor: ['#e53935', '#1e88e5', '#e53935', '#1e88e5', '#e53935'],
         borderColor: ['#d32f2f', '#1565c0', '#d32f2f', '#1565c0', '#d32f2f'],
         borderWidth: 1
@@ -88,34 +94,56 @@
     }
   });
 
-  // Data for candidates
-  const candidates = [
-    { name: 'Calon 1', image: 'assets/img/calon1.png', votes: 12 },
-    { name: 'Calon 2', image: 'assets/img/calon2.png', votes: 19 },
-    { name: 'Calon 3', image: 'assets/img/calon3.png', votes: 3 },
-    { name: 'Calon 4', image: 'assets/img/calon4.png', votes: 5 },
-    { name: 'Calon 5', image: 'assets/img/calon5.png', votes: 2 },
-  ];
+  // Fetch candidates and votes data from Supabase
+  async function fetchData() {
+    // Get candidates data
+    const { data: candidates, error: candidatesError } = await db.from("kandidat").select("*").order('no_urut', { ascending: true });
+    if (candidatesError) {
+      console.error("Error fetching candidates:", candidatesError);
+      return;
+    }
 
-  // Display candidates
-  const candidatesContainer = document.getElementById('candidates-container');
-  candidates.forEach(candidate => {
-    const candidateCard = document.createElement('div');
-    candidateCard.className = 'card';
-    candidateCard.innerHTML = `
-      <img src="${candidate.image}" alt="${candidate.name}">
-      <h3>${candidate.name}</h3>
-      <p>Suara: ${candidate.votes}</p>
-    `;
-    candidatesContainer.appendChild(candidateCard);
-  });
+    // Get votes data
+    const { data: votes, error: votesError } = await db.from("suara").select("kandidat_id");
+    if (votesError) {
+      console.error("Error fetching votes:", votesError);
+      return;
+    }
 
-  // Simulate live data change
-  setInterval(() => {
-    const newVotes = [12, 19, 3, 5, 2]; // This should be dynamic
-    myChart.data.datasets[0].data = newVotes; // Update chart data
+    // Count votes for each candidate
+    const voteCounts = candidates.map(candidate => {
+      return {
+        id: candidate.id,
+        votes: votes.filter(vote => vote.kandidat_id === candidate.id).length
+      };
+    });
+
+    // Update the chart data
+    myChart.data.labels = candidates.map(candidate => candidate.nama);
+    myChart.data.datasets[0].data = voteCounts.map(vote => vote.votes);
     myChart.update();
-  }, 2000); // Update every 2 seconds
+
+    // Display candidates info with their votes
+    const candidatesContainer = document.getElementById('candidates-container');
+    candidatesContainer.innerHTML = ''; // Clear previous data
+
+    candidates.forEach((candidate, index) => {
+      const candidateCard = document.createElement('div');
+      candidateCard.className = 'card';
+      candidateCard.innerHTML = `
+        <img src="assets/img/calon${index + 1}.png" alt="${candidate.nama}">
+        <h3>${candidate.nama}</h3>
+        <p>Suara: ${voteCounts[index].votes}</p>
+      `;
+      candidatesContainer.appendChild(candidateCard);
+    });
+  }
+
+  // Fetch and update data every 2 seconds
+  setInterval(fetchData, 2000);
+
+  // Initial fetch
+  fetchData();
 </script>
 
 </body>
